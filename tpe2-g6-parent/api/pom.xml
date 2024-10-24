@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>tpe2-g6-parent-parent</artifactId>
+    <groupId>ar.edu.itba.pod.tpe2</groupId>
+    <version>2024.2Q</version>
+  </parent>
+  <artifactId>tpe2-g6-parent-api</artifactId>
+  <version>2024.2Q</version>
+  <name>tpe2-g6-parent-api</name>
+
+  <dependencies>
+     <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast-all</artifactId>
+    </dependency>
+  </dependencies>
+</project>
