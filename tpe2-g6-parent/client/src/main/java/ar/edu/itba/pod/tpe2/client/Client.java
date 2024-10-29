@@ -1,5 +1,7 @@
 package ar.edu.itba.pod.tpe2.client;
 
+import ar.edu.itba.pod.tpe2.client.model.ReaderProvider;
+import ar.edu.itba.pod.tpe2.client.model.Ticket;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategyProvider;
 import com.hazelcast.client.HazelcastClient;
@@ -7,6 +9,10 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
+import com.hazelcast.mapreduce.Job;
+import com.hazelcast.mapreduce.JobTracker;
+import com.hazelcast.mapreduce.KeyValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +21,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 
@@ -51,24 +58,28 @@ public class Client {
             HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
             // Key Value Sources
-            //IMap<String, Ticket> ticketsIMap = hazelcastInstance.getMap("tickets");
-            //KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMap(ticketsIMap);
+            IMap<String, Ticket> ticketsIMap = hazelcastInstance.getMap("tickets");
+            KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMap(ticketsIMap);
 
             // CSV Files Reading and Key Value Source Loading
             // [get timestamp for file reading start]
-            //final AtomicInteger auxKey = new AtomicInteger(); //this is to be used for the tickets "uuid"
+            Date tsReadStart = new Date();
+            final AtomicInteger auxKey = new AtomicInteger(); //this is to be used for the tickets "uuid"
             //idea:
             // 1. check the city selected, choose a strategy for how to read the csvs
             // 2. read through infractions and agencies csv's first to get their "full names"
             // 3. read the tickets csv, replace agency and infraction id w/ the agency name and infraction-
             //description, at no point they ask for these IDs, so maybe we can side-step having to keep
             //look-up tables for these.
+            ReaderProvider.readFilesFor(city, ticketsIMap, auxKey);
             // [get timestamp for file reading end]
+            Date tsReadEnd = new Date();
 
             //Job Tracker
-            //JobTracker jobTracker = hazelcastInstance.getJobTracker("ticket-master")
+            JobTracker jobTracker = hazelcastInstance.getJobTracker("ticket-master");
 
             // [get timestamp for mapreducer start]
+            Date tsMRStart = new Date();
             //Queries
 
             //idea:
@@ -78,8 +89,9 @@ public class Client {
             // [get timestamp for mapreducers end]
             // 4. print logging file
             Date queryStart = new Date();
+            Job<String, Ticket> job = jobTracker.newJob(ticketsKeyValueSource);
             QueryStrategy queryStrategy = QueryStrategyProvider.getQueryStrategy(query);
-            //queryStrategy.run(queryStart, ticketsValueSource);
+            queryStrategy.run(queryStart, job);
 
         } finally {
             HazelcastClient.shutdownAll();
