@@ -1,5 +1,7 @@
 package ar.edu.itba.pod.tpe2.client;
 
+import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
+import ar.edu.itba.pod.tpe2.client.query.QueryStrategyProvider;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -67,11 +70,16 @@ public class Client {
 
             // [get timestamp for mapreducer start]
             //Queries
+
+            //idea:
             // 1. pick strategy based on query number
             // 2. do query
             // 3. print output file
             // [get timestamp for mapreducers end]
             // 4. print logging file
+            Date queryStart = new Date();
+            QueryStrategy queryStrategy = QueryStrategyProvider.getQueryStrategy(query);
+            //queryStrategy.run(queryStart, ticketsValueSource);
 
         } finally {
             HazelcastClient.shutdownAll();
