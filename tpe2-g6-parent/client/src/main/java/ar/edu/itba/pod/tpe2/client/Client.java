@@ -1,7 +1,7 @@
 package ar.edu.itba.pod.tpe2.client;
 
 import ar.edu.itba.pod.tpe2.client.model.ReaderProvider;
-import ar.edu.itba.pod.tpe2.client.model.Ticket;
+import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategyProvider;
 import com.hazelcast.client.HazelcastClient;
@@ -10,6 +10,7 @@ import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.MultiMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
@@ -58,8 +59,8 @@ public class Client {
             HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
             // Key Value Sources
-            IMap<String, Ticket> ticketsIMap = hazelcastInstance.getMap("tickets");
-            KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMap(ticketsIMap);
+            MultiMap<String, Ticket> ticketsMultiMap = hazelcastInstance.getMultiMap("tickets");
+            KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMultiMap(ticketsMultiMap);
 
             // CSV Files Reading and Key Value Source Loading
             // [get timestamp for file reading start]
@@ -71,18 +72,21 @@ public class Client {
             // 3. read the tickets csv, replace agency and infraction id w/ the agency name and infraction-
             //description, at no point they ask for these IDs, so maybe we can side-step having to keep
             //look-up tables for these.
-            ReaderProvider.readFilesFor(city, ticketsIMap, auxKey);
+            ReaderProvider.readFilesFor(city, ticketsMultiMap, auxKey);
             // [get timestamp for file reading end]
             Date tsReadEnd = new Date();
+
+            System.out.println("%s INFO [main] Client - Inicio de la lectura del archivo".formatted(tsReadStart.toString()));
+            System.out.println("%s INFO [main] Client - Fin de lectura del archivo".formatted(tsReadEnd.toString()));
+
 
             //Job Tracker
             JobTracker jobTracker = hazelcastInstance.getJobTracker("ticket-master");
 
-            // [get timestamp for mapreducer start]
-            Date tsMRStart = new Date();
             //Queries
 
             //idea:
+            // [get timestamp for mapreducer start]
             // 1. pick strategy based on query number
             // 2. do query
             // 3. print output file

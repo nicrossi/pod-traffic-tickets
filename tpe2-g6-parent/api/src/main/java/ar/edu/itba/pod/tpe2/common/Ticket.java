@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.tpe2.client.model;
+package ar.edu.itba.pod.tpe2.common;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -24,6 +24,13 @@ public class Ticket implements DataSerializable {
         this.infraction = infraction;
         this.amount = amount;
         this.date = date;
+    }
+
+    public String getInfraction() {
+        return infraction;
+    }
+    public String getAgency() {
+        return agency;
     }
 
     @Override
