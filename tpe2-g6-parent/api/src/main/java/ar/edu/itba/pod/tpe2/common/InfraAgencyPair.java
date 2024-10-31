@@ -28,6 +28,10 @@ public class InfraAgencyPair implements DataSerializable {
         this.agency = agency;
     }
 
+    public InfraAgencyPair() {
+
+    }
+
     public String getInfraction() {
         return infraction;
     }

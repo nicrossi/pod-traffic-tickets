@@ -26,6 +26,10 @@ public class Ticket implements DataSerializable {
         this.date = date;
     }
 
+    public Ticket(){
+
+    }
+
     public String getInfraction() {
         return infraction;
     }

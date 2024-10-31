@@ -29,7 +29,9 @@ public class Query1 implements QueryStrategy {
         // that can be done in a collator :)
 
         //SortedSet<Query1Result>
+        // Wait and retrieve the result
         Map<InfraAgencyPair, Long> results  = future.get();
+
         results.entrySet().stream().forEach(entry -> {
             InfraAgencyPair pair = entry.getKey();
             System.out.println("%s;%s;%d".formatted(pair.getInfraction(), pair.getAgency(), entry.getValue()));

@@ -1,14 +1,18 @@
 package ar.edu.itba.pod.tpe2.client;
 
 import ar.edu.itba.pod.tpe2.client.model.ReaderProvider;
+import ar.edu.itba.pod.tpe2.common.InfraAgencyPair;
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategyProvider;
+import ar.edu.itba.pod.tpe2.mapper.query1.Query1Mapper;
+import ar.edu.itba.pod.tpe2.reducer.query1.Query1ReducerFactory;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.MultiMap;
 import com.hazelcast.mapreduce.Job;
@@ -21,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -62,6 +67,8 @@ public class Client {
             MultiMap<String, Ticket> ticketsMultiMap = hazelcastInstance.getMultiMap("tickets");
             KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMultiMap(ticketsMultiMap);
 
+            System.out.println(ticketsMultiMap.size());
+
             // CSV Files Reading and Key Value Source Loading
             // [get timestamp for file reading start]
             Date tsReadStart = new Date();
@@ -94,8 +101,25 @@ public class Client {
             // 4. print logging file
             Date queryStart = new Date();
             Job<String, Ticket> job = jobTracker.newJob(ticketsKeyValueSource);
+
             QueryStrategy queryStrategy = QueryStrategyProvider.getQueryStrategy(query);
             queryStrategy.run(queryStart, job);
+
+            /*
+            ICompletableFuture<Map<InfraAgencyPair, Long>> future = job
+                    .mapper(new Query1Mapper())
+                    .reducer(new Query1ReducerFactory())
+                    .submit();
+
+
+
+            Map<InfraAgencyPair, Long> results  = future.get();
+            results.entrySet().stream().forEach(entry -> {
+                InfraAgencyPair pair = entry.getKey();
+                System.out.println("%s;%s;%d".formatted(pair.getInfraction(), pair.getAgency(), entry.getValue()));
+            });
+            */
+
 
         } finally {
             HazelcastClient.shutdownAll();
