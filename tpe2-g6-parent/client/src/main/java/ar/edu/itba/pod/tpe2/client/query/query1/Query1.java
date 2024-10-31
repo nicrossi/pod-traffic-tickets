@@ -8,13 +8,18 @@ import ar.edu.itba.pod.tpe2.reducer.query1.Query1ReducerFactory;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobCompletableFuture;
+import lombok.NoArgsConstructor;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+@NoArgsConstructor
 public class Query1 implements QueryStrategy {
+
+    public Query1(String s) {
+    }
 
     @Override
     public void run(Date timeStart, Job<String, Ticket> job) throws ExecutionException, InterruptedException {

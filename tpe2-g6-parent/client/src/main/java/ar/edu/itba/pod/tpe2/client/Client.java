@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.tpe2.client;
 
 import ar.edu.itba.pod.tpe2.client.model.ReaderProvider;
+import ar.edu.itba.pod.tpe2.client.query.QueryType;
 import ar.edu.itba.pod.tpe2.common.InfraAgencyPair;
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
@@ -87,7 +88,7 @@ public class Client {
             MultiMap<String, Ticket> ticketsMultiMap = hazelcastInstance.getMultiMap("tickets");
             KeyValueSource<String, Ticket> ticketsKeyValueSource = KeyValueSource.fromMultiMap(ticketsMultiMap);
 
-            System.out.println(ticketsMultiMap.size());
+            System.out.println("ticketsMultimap.size: " + ticketsMultiMap.size());
 
             // CSV Files Reading and Key Value Source Loading
             // [get timestamp for file reading start]
@@ -122,7 +123,9 @@ public class Client {
             Date queryStart = new Date();
             Job<String, Ticket> job = jobTracker.newJob(ticketsKeyValueSource);
 
-            QueryStrategy queryStrategy = QueryStrategyProvider.getQueryStrategy(query);
+            QueryStrategyProvider qsp = new QueryStrategyProvider();
+
+            QueryStrategy queryStrategy = qsp.getQueryStrategy(QueryType.selectQuery(query));
             queryStrategy.run(queryStart, job);
 
             /*

@@ -15,6 +15,10 @@
       <artifactId>tpe2-g6-parent-api</artifactId>
       <version>2024.2Q</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/java</testSourceDirectory>
