@@ -9,6 +9,7 @@ import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobCompletableFuture;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -22,20 +23,28 @@ public class Query1 implements QueryStrategy {
         ICompletableFuture<Map<InfraAgencyPair, Long>> future = job
                 .mapper(new Query1Mapper())
                 .reducer(new Query1ReducerFactory())
-                .submit();
-
-        //What's missing?
         // - ordering by infraction and then by agency
-        // that can be done in a collator :)
+        // can be done in a collator :)
+                .submit();
 
         //SortedSet<Query1Result>
         // Wait and retrieve the result
-        Map<InfraAgencyPair, Long> results  = future.get();
+        Map<InfraAgencyPair, Long> results = future.get();
 
-        results.entrySet().stream().forEach(entry -> {
-            InfraAgencyPair pair = entry.getKey();
-            System.out.println("%s;%s;%d".formatted(pair.getInfraction(), pair.getAgency(), entry.getValue()));
-        });
+        results.entrySet().stream()
+
+                .sorted(
+                        Map.Entry.<InfraAgencyPair, Long>comparingByValue().reversed()
+                                .thenComparing(
+                                        Comparator.comparing(o -> o.getKey().getAgency())
+                                )
+                )
+
+                .forEach(entry -> {
+                    InfraAgencyPair pair = entry.getKey();
+                    //TODO: print to output file
+                    System.out.println("%s;%s;%d".formatted(pair.getInfraction(), pair.getAgency(), entry.getValue()));
+                });
         Date timeEnd = new Date();
         System.out.println("%s INFO [main] Client - Inicio del trabajo map/reduce".formatted(timeStart.toString()));
         System.out.println("%s INFO [main] Client - Fin del trabajo map/reduce".formatted(timeEnd.toString()));

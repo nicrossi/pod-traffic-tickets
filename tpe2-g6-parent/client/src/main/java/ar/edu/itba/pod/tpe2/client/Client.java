@@ -47,6 +47,26 @@ public class Client {
         final String inPath = System.getProperty("inPath");
         final String outPath = System.getProperty("outPath");
 
+        boolean strictAgencies = false, strictInfractions = false;
+        switch (query) {
+            case "1":
+                strictAgencies = true;
+                strictInfractions = true;
+                break;
+            case "2":
+                strictAgencies = true;
+                break;
+            case "4":
+                strictInfractions = true;
+                break;
+            case "3":
+                strictAgencies = false;
+                strictInfractions = false;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid query: " + query);
+        }
+
         getAddresses(addresses).stream().forEach(System.out::println);
 
         try {
@@ -79,7 +99,7 @@ public class Client {
             // 3. read the tickets csv, replace agency and infraction id w/ the agency name and infraction-
             //description, at no point they ask for these IDs, so maybe we can side-step having to keep
             //look-up tables for these.
-            ReaderProvider.readFilesFor(city, ticketsMultiMap, auxKey);
+            ReaderProvider.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
             // [get timestamp for file reading end]
             Date tsReadEnd = new Date();
 

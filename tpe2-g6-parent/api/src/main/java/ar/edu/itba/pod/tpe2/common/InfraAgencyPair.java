@@ -17,8 +17,8 @@ public class InfraAgencyPair implements DataSerializable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof InfraAgencyPair) {
-            InfraAgencyPair other = (InfraAgencyPair) obj;
-            return infraction.equals(other.getInfraction()) && agency.equals(other.getAgency());
+            InfraAgencyPair pair = (InfraAgencyPair) obj;
+            return infraction.equals(pair.infraction) && agency.equals(pair.agency);
         }
         return false;
     }
