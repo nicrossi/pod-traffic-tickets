@@ -1,7 +1,7 @@
 package ar.edu.itba.pod.tpe2.client.query.query3;
 
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
-import ar.edu.itba.pod.tpe2.client.util.DateUtils;
+import ar.edu.itba.pod.tpe2.client.utils.DateUtils;
 import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.collator.query3.Query3Collator;
 import ar.edu.itba.pod.tpe2.common.Ticket;

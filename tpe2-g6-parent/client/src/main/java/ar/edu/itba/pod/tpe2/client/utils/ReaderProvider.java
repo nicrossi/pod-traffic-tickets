@@ -63,7 +63,6 @@ public class ReaderProvider {
             AtomicInteger key
     ) throws IOException {
         // CSV File Reading and Key Value Source Loading
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsCHI.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
@@ -75,7 +74,7 @@ public class ReaderProvider {
                                     parts[1],
                                     infractionsMap.get(parts[4]),
                                     Double.valueOf(parts[5]),
-                                    LocalDateTime.parse(parts[0], formatter)
+                                    DateUtils.parseDateCHI(parts[0])
                             )
                     ).forEach(ticket -> ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), ticket));
         }
@@ -92,7 +91,6 @@ public class ReaderProvider {
             AtomicInteger key
     ) throws IOException {
         // CSV File Reading and Key Value Source Loading
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsNYC.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
@@ -104,7 +102,7 @@ public class ReaderProvider {
                             parts[5],
                             infractionsMap.get(parts[1]),
                             Double.valueOf(parts[2]),
-                            LocalDateTime.parse(parts[4], formatter))
+                            DateUtils.parseDateNYC(parts[4]))
                     ).forEach(ticket -> ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), ticket));
         }
     }
