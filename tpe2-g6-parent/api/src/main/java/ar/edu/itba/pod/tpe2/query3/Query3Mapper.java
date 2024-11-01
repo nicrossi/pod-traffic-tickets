@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.tpe2.mapper.query3;
+package ar.edu.itba.pod.tpe2.query3;
 
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import com.hazelcast.mapreduce.Context;

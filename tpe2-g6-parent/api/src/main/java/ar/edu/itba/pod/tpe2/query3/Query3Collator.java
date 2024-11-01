@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.tpe2.collator.query3;
+package ar.edu.itba.pod.tpe2.query3;
 
 import com.hazelcast.mapreduce.Collator;
 import org.apache.commons.lang3.Validate;

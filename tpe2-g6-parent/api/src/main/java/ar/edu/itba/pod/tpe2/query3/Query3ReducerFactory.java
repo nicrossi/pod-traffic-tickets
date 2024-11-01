@@ -1,9 +1,7 @@
-package ar.edu.itba.pod.tpe2.reducer.query3;
+package ar.edu.itba.pod.tpe2.query3;
 
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.HashSet;
