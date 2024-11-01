@@ -1,14 +1,13 @@
 package ar.edu.itba.pod.tpe2.client.query.query1;
 
-import ar.edu.itba.pod.tpe2.client.model.Writer;
+import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.common.InfraAgencyPair;
-import ar.edu.itba.pod.tpe2.mapper.query1.Query1Mapper;
-import ar.edu.itba.pod.tpe2.reducer.query1.Query1ReducerFactory;
+import ar.edu.itba.pod.tpe2.common.query1.Query1Mapper;
+import ar.edu.itba.pod.tpe2.common.query1.Query1ReducerFactory;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.mapreduce.Job;
-import com.hazelcast.mapreduce.JobCompletableFuture;
 import lombok.NoArgsConstructor;
 
 import java.util.Comparator;

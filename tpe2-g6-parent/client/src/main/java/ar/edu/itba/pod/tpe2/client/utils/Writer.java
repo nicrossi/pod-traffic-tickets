@@ -1,14 +1,11 @@
-package ar.edu.itba.pod.tpe2.client.model;
+package ar.edu.itba.pod.tpe2.client.utils;
 
-import ar.edu.itba.pod.tpe2.client.query.QueryType;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.Validate;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,15 +13,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Writer {
-    @FunctionalInterface
-    public interface Mapper<T> {
-        String map(T t);
-    }
     private List<String> logs = new ArrayList<>();
     private List<String> results = new ArrayList<>();
-
+    private String outPath, query;
+    
     public Writer() {
-
+        outPath = Validate.notBlank(System.getProperty("outPath"));
+        query = Validate.notBlank(System.getProperty("query"));
     }
 
     public String dateFormatted(Date date) {
@@ -39,9 +34,6 @@ public class Writer {
         logs.add(log);
     }
     public void outputLogs() {
-        //TODO: add validate
-        final String outPath = System.getProperty("outPath");
-        final String query = System.getProperty("query");
         String path = outPath + "time" + query + ".txt";
 
         StringBuilder builder = new StringBuilder();
@@ -59,9 +51,6 @@ public class Writer {
     }
 
     public void outputResults(String[] headers) {
-        //TODO: add validate
-        final String outPath = System.getProperty("outPath");
-        final String query = System.getProperty("query");
         String path = outPath + "query" + query + ".csv";
 
         StringBuilder builder = new StringBuilder();

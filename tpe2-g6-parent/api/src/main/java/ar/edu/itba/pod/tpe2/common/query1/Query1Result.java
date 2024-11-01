@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.tpe2.reducer.query1;
+package ar.edu.itba.pod.tpe2.common.query1;
 
 public record Query1Result(String infraction, String agency, long tickets) {
     @Override

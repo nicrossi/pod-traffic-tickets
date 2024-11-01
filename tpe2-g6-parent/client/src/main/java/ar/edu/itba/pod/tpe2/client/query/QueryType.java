@@ -9,7 +9,8 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum QueryType {
-    QUERY_1("1");
+    QUERY_1("1"),
+    QUERY_1A("1A");
 
     private final String queryStrNum;
 
