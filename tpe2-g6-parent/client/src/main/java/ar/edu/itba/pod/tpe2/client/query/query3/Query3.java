@@ -2,6 +2,7 @@ package ar.edu.itba.pod.tpe2.client.query.query3;
 
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.client.util.DateUtils;
+import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.collator.query3.Query3Collator;
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.mapper.query3.Query3Mapper;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -32,7 +32,7 @@ public class Query3 implements QueryStrategy {
     }
 
     @Override
-    public void run(Date timeStart, Job<String, Ticket> job) throws ExecutionException, InterruptedException {
+    public void run(Writer writer , Job<String, Ticket> job) throws ExecutionException, InterruptedException {
         LocalDateTime from = DateUtils.parseDate(args.get("from"));
         LocalDateTime to = DateUtils.parseDate(args.get("to")).withHour(23).withMinute(59).withSecond(59);
         int n = Integer.parseInt(args.get("n"));
@@ -44,9 +44,6 @@ public class Query3 implements QueryStrategy {
         List<String> results = future.get();
         results.forEach(System.out::println);
 
-        Date timeEnd = new Date();
-        log.info("{} INFO [main] Client - Inicio del trabajo map/reduce", timeStart.toString());
-        log.info("{} INFO [main] Client - Fin del trabajo map/reduce", timeEnd.toString());
-
+        // TODO: Add writer
     }
 }

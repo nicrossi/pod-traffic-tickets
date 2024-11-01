@@ -12,6 +12,7 @@ import com.hazelcast.mapreduce.Job;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 
@@ -20,7 +21,8 @@ public class Query1A implements QueryStrategy {
 
     private static final String[] headers = {"Infraction", "Agency", "Tickets"};
 
-    public Query1A(String s) {
+    public Query1A(Map<String, String> args) {
+        // Needed for QueryStrategyFactory
     }
 
     @Override
