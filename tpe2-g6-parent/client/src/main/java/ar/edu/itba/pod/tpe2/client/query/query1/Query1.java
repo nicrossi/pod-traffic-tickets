@@ -17,10 +17,10 @@ import java.util.concurrent.ExecutionException;
 
 @NoArgsConstructor
 public class Query1 implements QueryStrategy {
-
     private static final String[] headers = {"Infraction", "Agency", "Tickets"};
 
-    public Query1(String s) {
+    public Query1(Map<String, String> args) {
+        // Needed for QueryStrategyFactory
     }
 
     @Override

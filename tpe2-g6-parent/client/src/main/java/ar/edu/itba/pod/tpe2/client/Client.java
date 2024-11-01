@@ -15,27 +15,28 @@ import com.hazelcast.core.MultiMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class Client {
-
-    private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
     private static List<String> getAddresses(final String addresses) {
         return Arrays.stream(addresses.replace("'", "").split(";")).toList();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
-        logger.info("G6 Client Starting ...");
+        log.info("G6 Client Starting ...");
 
         final String query = Validate.notBlank(System.getProperty("query"));
         final String addresses = Validate.notBlank(System.getProperty("addresses"));
@@ -43,6 +44,21 @@ public class Client {
 
         if(!city.matches("CHI") && !city.matches("NYC")) {
             throw new IllegalArgumentException("Invalid city: " + city);
+        }
+
+        // TODO: Do this in a more elegant way...
+        Map<String, String> optargs = new HashMap<>();
+        final String from = System.getProperty("from");
+        if (StringUtils.isNotBlank(from)) {
+            optargs.put("from", from);
+        }
+        final String to = System.getProperty("to");
+        if (StringUtils.isNotBlank(to)) {
+            optargs.put("to", to);
+        }
+        final String n = System.getProperty("n");
+        if (StringUtils.isNotBlank(n)) {
+            optargs.put("n", n);
         }
 
         boolean strictAgencies = false, strictInfractions = false;
@@ -116,6 +132,8 @@ public class Client {
                             tsReadEnd
             );
 
+            log.info("{} INFO [main] Client - Inicio de la lectura del archivo", tsReadStart.toString());
+            log.info("{} INFO [main] Client - Fin de lectura del archivo", tsReadEnd.toString());
 
             //Job Tracker (one for each query)
             JobTracker jobTracker = hazelcastInstance.getJobTracker("g6-ticket-master-query" + query);
@@ -134,7 +152,7 @@ public class Client {
 
             QueryStrategyProvider qsp = new QueryStrategyProvider();
 
-            QueryStrategy queryStrategy = qsp.getQueryStrategy(QueryType.selectQuery(query));
+            QueryStrategy queryStrategy = qsp.getQueryStrategy(QueryType.selectQuery(query), optargs);
             queryStrategy.run(writer, job);
 
             //Results should be written by the end of querystrategy,
