@@ -19,10 +19,6 @@ import java.util.concurrent.ExecutionException;
 public class Query1 implements QueryStrategy {
     private static final String[] headers = {"Infraction", "Agency", "Tickets"};
 
-    public Query1(Map<String, String> args) {
-        // Needed for QueryStrategyFactory
-    }
-
     @Override
     public void run(Writer writer, Job<String, Ticket> job) throws ExecutionException, InterruptedException {
         Date mpStart = new Date();
