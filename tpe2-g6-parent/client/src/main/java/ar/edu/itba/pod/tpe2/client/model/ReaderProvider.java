@@ -35,7 +35,7 @@ public class ReaderProvider {
 
         // get infractions and their names
         Map<String, String> infractionsMap = new HashMap<>();
-        try(Stream<String> lines = Files.lines(Paths.get(inPath + "/infractionsCHI.csv"), StandardCharsets.UTF_8)) {
+        try(Stream<String> lines = Files.lines(Paths.get(inPath + "infractionsCHI.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
                     .forEach(parts -> infractionsMap.put(parts[0], parts[1]));
@@ -43,14 +43,14 @@ public class ReaderProvider {
 
         // get agencies
         List<String> agencies = new ArrayList<>();
-        try(Stream<String> lines = Files.lines(Paths.get(inPath + "/agenciesCHI.csv"), StandardCharsets.UTF_8)) {
+        try(Stream<String> lines = Files.lines(Paths.get(inPath + "agenciesCHI.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .forEach(line -> agencies.add(line));
         }
 
         // CSV File Reading and Key Value Source Loading
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "/ticketsCHI.csv"), StandardCharsets.UTF_8)) {
+        try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsCHI.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
                     .filter(parts -> !strictAgencies || agencies.contains(parts[2]))
@@ -73,7 +73,7 @@ public class ReaderProvider {
 
         // get infractions and their names
         Map<String, String> infractionsMap = new HashMap<>();
-        try(Stream<String> lines = Files.lines(Paths.get(inPath + "/infractionsNYC.csv"), StandardCharsets.UTF_8)) {
+        try(Stream<String> lines = Files.lines(Paths.get(inPath + "infractionsNYC.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
                     .forEach(parts -> infractionsMap.put(parts[0], parts[1]));
@@ -81,14 +81,14 @@ public class ReaderProvider {
 
         // get agencies
         List<String> agencies = new ArrayList<>();
-        try(Stream<String> lines = Files.lines(Paths.get(inPath + "/agenciesNYC.csv"), StandardCharsets.UTF_8)) {
+        try(Stream<String> lines = Files.lines(Paths.get(inPath + "agenciesNYC.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .forEach(line -> agencies.add(line));
         }
 
         // CSV File Reading and Key Value Source Loading
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "/ticketsNYC.csv"), StandardCharsets.UTF_8)) {
+        try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsNYC.csv"), StandardCharsets.UTF_8)) {
             lines.skip(1)
                     .map(line -> line.split(";"))
                     .filter(parts -> !strictAgencies || agencies.contains(parts[3]))
