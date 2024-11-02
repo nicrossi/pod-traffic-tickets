@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class Ticket implements DataSerializable {
-    private String plate, agency, county, infraction;
+    private String plate, agency, county, infraction, infractionCode;
     private Double amount;
     private LocalDateTime date;
 
@@ -24,6 +24,7 @@ public class Ticket implements DataSerializable {
         objectDataOutput.writeUTF(agency);
         objectDataOutput.writeUTF(county);
         objectDataOutput.writeUTF(infraction);
+        objectDataOutput.writeUTF(infractionCode);
         objectDataOutput.writeDouble(amount);
         objectDataOutput.writeObject(date);
     }
@@ -34,6 +35,7 @@ public class Ticket implements DataSerializable {
         agency = objectDataInput.readUTF();
         county = objectDataInput.readUTF();
         infraction = objectDataInput.readUTF();
+        infractionCode = objectDataInput.readUTF();
         amount = objectDataInput.readDouble();
         date = objectDataInput.readObject();
     }

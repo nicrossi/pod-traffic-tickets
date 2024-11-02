@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.tpe2.client;
 
+import ar.edu.itba.pod.tpe2.client.utils.ReadService;
 import ar.edu.itba.pod.tpe2.client.utils.ReaderProvider;
 import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.client.query.QueryType;
@@ -123,7 +124,9 @@ public class Client {
             //look-up tables for these.
 
             final AtomicInteger auxKey = new AtomicInteger(); //this is to be used for the tickets "uuid"
-            ReaderProvider.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
+            // ReaderProvider.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
+            final ReadService readService = new ReadService();
+            readService.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
 
             // [get timestamp for file reading end]
             Date tsReadEnd = new Date();
@@ -151,7 +154,6 @@ public class Client {
             Job<String, Ticket> job = jobTracker.newJob(ticketsKeyValueSource);
 
             QueryStrategyProvider qsp = new QueryStrategyProvider();
-
             QueryStrategy queryStrategy = qsp.getQueryStrategy(QueryType.selectQuery(query), optargs);
             queryStrategy.run(writer, job);
 

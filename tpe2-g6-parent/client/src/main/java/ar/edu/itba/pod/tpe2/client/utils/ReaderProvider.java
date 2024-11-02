@@ -73,6 +73,7 @@ public class ReaderProvider {
                                     parts[2],
                                     parts[1],
                                     infractionsMap.get(parts[4]),
+                                    parts[4],
                                     Double.valueOf(parts[5]),
                                     DateUtils.parseDateCHI(parts[0])
                             )
@@ -101,6 +102,7 @@ public class ReaderProvider {
                             parts[3],
                             parts[5],
                             infractionsMap.get(parts[1]),
+                            parts[1],
                             Double.valueOf(parts[2]),
                             DateUtils.parseDateNYC(parts[4]))
                     ).forEach(ticket -> ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), ticket));
