@@ -50,6 +50,7 @@ public class Query3Collator implements Collator<Map.Entry<String, Map<String, Lo
 
     private List<String> formatResults(Map<String, Double> countyPercentages) {
         return countyPercentages.entrySet().stream()
+                .filter(entry -> entry.getValue() != 0)
                 .sorted((e1, e2) -> {
                     int cmp = e2.getValue().compareTo(e1.getValue());
                     if (cmp == 0) {
