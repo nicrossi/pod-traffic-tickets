@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -21,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @NoArgsConstructor(force = true)
 public class Query3 implements QueryStrategy {
+    private static final String[] headers = {"County", "Percentage"};
     private final Map<String, String> args;
 
     public Query3(Map<String, String> args) {
@@ -33,6 +35,9 @@ public class Query3 implements QueryStrategy {
 
     @Override
     public void run(Writer writer , Job<String, Ticket> job) throws ExecutionException, InterruptedException {
+        Date mpStart = new Date();
+        writer.addLog("%s INFO [main] Client - Inicio del trabajo map/reduce", mpStart);
+
         LocalDateTime from = DateUtils.parseDate(args.get("from"));
         LocalDateTime to = DateUtils.parseDate(args.get("to")).withHour(23).withMinute(59).withSecond(59);
         int n = Integer.parseInt(args.get("n"));
@@ -42,8 +47,12 @@ public class Query3 implements QueryStrategy {
                 .submit(new Query3Collator());
 
         List<String> results = future.get();
-        results.forEach(System.out::println);
+        results.forEach(writer::addResult);
 
-        // TODO: Add writer
+        writer.outputResults(headers);
+
+        Date mpEnd = new Date();
+        writer.addLog("%s INFO [main] Client - Fin del trabajo map/reduce", mpEnd);
+
     }
 }

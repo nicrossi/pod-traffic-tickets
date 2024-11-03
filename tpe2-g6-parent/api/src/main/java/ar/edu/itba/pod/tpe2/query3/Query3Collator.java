@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Query3Collator implements Collator<Map.Entry<String, Map<String, Long>>, List<String>> {
 
@@ -50,21 +49,18 @@ public class Query3Collator implements Collator<Map.Entry<String, Map<String, Lo
     }
 
     private List<String> formatResults(Map<String, Double> countyPercentages) {
-        return Stream.concat(
-                Stream.of("County;Percentage"),
-                // Sort by percentage in descending order, then by county name alphabetically
-                countyPercentages.entrySet().stream()
-                        .sorted((e1, e2) -> {
-                            int cmp = e2.getValue().compareTo(e1.getValue());
-                            if (cmp == 0) {
-                                return e1.getKey().compareTo(e2.getKey());
-                            }
-                            return cmp;
-                        })
-                        .map(entry -> String.format("%s;%.2f%%",
-                                entry.getKey(),
-                                truncate2Decimals(entry.getValue())))
-        ).collect(Collectors.toList());
+        return countyPercentages.entrySet().stream()
+                .sorted((e1, e2) -> {
+                    int cmp = e2.getValue().compareTo(e1.getValue());
+                    if (cmp == 0) {
+                        return e1.getKey().compareTo(e2.getKey());
+                    }
+                    return cmp;
+                })
+                .map(entry -> String.format("%s;%.2f%%",
+                        entry.getKey(),
+                        truncate2Decimals(entry.getValue())))
+                .toList();
     }
 
     private double truncate2Decimals(double number) {
