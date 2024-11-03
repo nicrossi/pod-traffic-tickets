@@ -17,13 +17,10 @@ import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -39,70 +36,17 @@ public class Client {
     public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
         log.info("G6 Client Starting ...");
 
-        final String query = Validate.notBlank(System.getProperty("query"));
-        final String addresses = Validate.notBlank(System.getProperty("addresses"));
-        final String city = Validate.notBlank(System.getProperty("city"));
-
-        if(!city.matches("CHI") && !city.matches("NYC")) {
-            throw new IllegalArgumentException("Invalid city: " + city);
-        }
-
-        // TODO: Do this in a more elegant way...
-        Map<String, String> optargs = new HashMap<>();
-        final String from = System.getProperty("from");
-        if (StringUtils.isNotBlank(from)) {
-            optargs.put("from", from);
-        }
-        final String to = System.getProperty("to");
-        if (StringUtils.isNotBlank(to)) {
-            optargs.put("to", to);
-        }
-        final String n = System.getProperty("n");
-        if (StringUtils.isNotBlank(n)) {
-            optargs.put("n", n);
-        }
-        final String agency = System.getProperty("agency");
-        if (StringUtils.isNotBlank(agency)) {
-            optargs.put("agency", agency);
-        }
-
-        boolean strictAgencies = false, strictInfractions = false;
-        switch (query) {
-            case "1":
-            case "1A":
-                strictAgencies = true;
-                strictInfractions = true;
-                break;
-            case "2":
-                strictAgencies = true;
-                break;
-            case "4":
-                strictInfractions = true;
-                break;
-            case "3":
-                strictAgencies = false;
-                strictInfractions = false;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid query: " + query);
-        }
-
+        ClientArguments clientAgrs = new ClientArguments();
+        final String query = clientAgrs.getQuery();
+        final String addresses = clientAgrs.getAddresses();
+        final String city = clientAgrs.getCity();
+        Map<String, String> optargs = clientAgrs.getOptargs();
+        boolean strictAgencies = clientAgrs.isStrictAgencies();
+        boolean strictInfractions = clientAgrs.isStrictInfractions();
         Writer writer = new Writer();
 
-        //getAddresses(addresses).stream().forEach(System.out::println);
-
         try {
-            // Group Config
-            GroupConfig groupConfig = new GroupConfig().setName("g6").setPassword("g6-pass");
-
-            // Client Network Config
-            ClientNetworkConfig clientNetworkConfig = new ClientNetworkConfig();
-            // add all addresses we are supposed to connect to...
-            getAddresses(addresses).stream().forEach(clientNetworkConfig::addAddress);
-
-            // Client Config
-            ClientConfig clientConfig = new ClientConfig().setGroupConfig(groupConfig).setNetworkConfig(clientNetworkConfig);
-
+            ClientConfig clientConfig = getClientConfig(addresses);
             // Node Client
             HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
@@ -142,9 +86,6 @@ public class Client {
                             tsReadEnd
             );
 
-            log.info("{} INFO [main] Client - Inicio de la lectura del archivo", tsReadStart.toString());
-            log.info("{} INFO [main] Client - Fin de lectura del archivo", tsReadEnd.toString());
-
             //Job Tracker (one for each query)
             JobTracker jobTracker = hazelcastInstance.getJobTracker("g6-ticket-master-query" + query);
 
@@ -171,5 +112,18 @@ public class Client {
         } finally {
             HazelcastClient.shutdownAll();
         }
+    }
+
+    private static ClientConfig getClientConfig(String addresses) {
+        GroupConfig groupConfig = new GroupConfig().setName("g6").setPassword("g6-pass");
+        // Client Network Config
+        ClientNetworkConfig clientNetworkConfig = new ClientNetworkConfig();
+        // add all addresses we are supposed to connect to...
+        getAddresses(addresses).forEach(clientNetworkConfig::addAddress);
+
+        // Client Config
+        return new ClientConfig()
+                .setGroupConfig(groupConfig)
+                .setNetworkConfig(clientNetworkConfig);
     }
 }
