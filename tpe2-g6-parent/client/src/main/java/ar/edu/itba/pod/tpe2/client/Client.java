@@ -61,6 +61,10 @@ public class Client {
         if (StringUtils.isNotBlank(n)) {
             optargs.put("n", n);
         }
+        final String agency = System.getProperty("agency");
+        if (StringUtils.isNotBlank(agency)) {
+            optargs.put("agency", agency);
+        }
 
         boolean strictAgencies = false, strictInfractions = false;
         switch (query) {
