@@ -11,6 +11,7 @@ import com.hazelcast.mapreduce.Job;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -19,17 +20,24 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @NoArgsConstructor(force = true)
 public class Query2 implements QueryStrategy {
+    private static final String[] headers = { "Agency", "Year", "Month", "YTD" };
 
     @Override
     public void run(Writer writer, Job<String, Ticket> job) throws ExecutionException, InterruptedException {
+        Date mpStart = new Date();
+        writer.addLog("%s INFO [main] Client - Inicio del trabajo map/reduce", mpStart);
+
         ICompletableFuture<List<String>> future = job
                 .mapper(new Query2Mapper())
                 .reducer(new Query2ReducerFactory())
                 .submit(new Query2Collator());
 
         List<String> results = future.get();
-        results.forEach(System.out::println);
+        results.forEach(writer::addResult);
 
-        // TODO: Add writer
+        writer.outputResults(headers);
+
+        Date mpEnd = new Date();
+        writer.addLog("%s INFO [main] Client - Fin del trabajo map/reduce", mpEnd);
     }
 }
