@@ -5,6 +5,7 @@ import ar.edu.itba.pod.tpe2.client.query.query2.Query2;
 import ar.edu.itba.pod.tpe2.client.query.query2.Query2A;
 import ar.edu.itba.pod.tpe2.client.query.query3.Query3;
 import ar.edu.itba.pod.tpe2.client.query.query1.Query1;
+import ar.edu.itba.pod.tpe2.client.query.query3.Query3A;
 import ar.edu.itba.pod.tpe2.client.query.query4.Query4;
 import lombok.NonNull;
 
@@ -27,6 +28,7 @@ public class QueryStrategyProvider {
        // no combiner alternatives:
        strategyMap.put(QueryType.QUERY_1A, new Query1A());
        strategyMap.put(QueryType.QUERY_2A, new Query2A());
+       strategyMap.put(QueryType.QUERY_3A, new Query3A());
    }
 
     public QueryStrategy getQueryStrategy(QueryType queryType, @NonNull Map<String, String> optargs) {

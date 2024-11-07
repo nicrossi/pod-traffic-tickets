@@ -14,6 +14,7 @@ public enum QueryType {
     QUERY_2("2"),
     QUERY_2A("2A"),
     QUERY_3("3"),
+    QUERY_3A("3A"),
     QUERY_4("4");
 
     private final String queryStrNum;

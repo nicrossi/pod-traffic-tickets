@@ -14,6 +14,7 @@ public class QueryStrategyFactory {
 
     public QueryStrategyFactory() {
         strategyMap.put(QueryType.QUERY_3, Query3::new);
+        strategyMap.put(QueryType.QUERY_3A, Query3::new);
         strategyMap.put(QueryType.QUERY_4, Query4::new);
     }
 
