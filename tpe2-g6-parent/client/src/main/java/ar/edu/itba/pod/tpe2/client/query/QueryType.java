@@ -12,6 +12,7 @@ public enum QueryType {
     QUERY_1("1"),
     QUERY_1A("1A"),
     QUERY_2("2"),
+    QUERY_2A("2A"),
     QUERY_3("3"),
     QUERY_4("4");
 
