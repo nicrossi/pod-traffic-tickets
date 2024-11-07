@@ -1,7 +1,7 @@
 package ar.edu.itba.pod.tpe2.client.query;
 
-import ar.edu.itba.pod.tpe2.client.query.query3.Query3;
-import ar.edu.itba.pod.tpe2.client.query.query4.Query4;
+import ar.edu.itba.pod.tpe2.client.query.query3.*;
+import ar.edu.itba.pod.tpe2.client.query.query4.*;
 import org.apache.commons.lang3.Validate;
 
 import java.util.HashMap;
@@ -14,8 +14,9 @@ public class QueryStrategyFactory {
 
     public QueryStrategyFactory() {
         strategyMap.put(QueryType.QUERY_3, Query3::new);
-        strategyMap.put(QueryType.QUERY_3A, Query3::new);
+        strategyMap.put(QueryType.QUERY_3A, Query3A::new);
         strategyMap.put(QueryType.QUERY_4, Query4::new);
+        strategyMap.put(QueryType.QUERY_4A, Query4A::new);
     }
 
     public QueryStrategy create(QueryType queryType, Map<String, String> optargs) {

@@ -61,6 +61,7 @@ public class ClientArguments {
                 strictAgencies = true;
                 break;
             case "4":
+            case "4A":
                 strictInfractions = true;
                 break;
             case "3":

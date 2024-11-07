@@ -22,14 +22,14 @@ public class Query4ReducerFactory implements ReducerFactory<String, Double, Infr
 
         @Override
         public void beginReduce() {
-            min = 0D;
+            min = -1D;
             max = 0D;
         }
 
         @Override
         public void reduce(Double fineAmount) {
             max = Math.max(max, fineAmount);
-            min = Math.min(min, fineAmount);
+            min = min == -1D ? fineAmount : Math.min(min, fineAmount);
         }
 
         @Override
