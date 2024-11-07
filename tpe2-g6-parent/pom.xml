@@ -21,6 +21,7 @@
     <hazelcast.version>3.8.6</hazelcast.version>
     <lombok.version>1.18.34</lombok.version>
     <commons.lang3.version>3.17.0</commons.lang3.version>
+    <fastcsv.version>3.4.0</fastcsv.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -47,6 +48,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${commons.lang3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.siegmar</groupId>
+        <artifactId>fastcsv</artifactId>
+        <version>${fastcsv.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -15,6 +15,7 @@ public class ClientArguments {
     private final String query;
     private final String addresses;
     private final String city;
+    private final String readerType;
 
     private boolean strictAgencies = false;
     private boolean strictInfractions = false;
@@ -28,6 +29,7 @@ public class ClientArguments {
         this.addresses = Validate.notBlank(System.getProperty("addresses"));
         this.city = Validate.notBlank(System.getProperty("city"));
         Validate.isTrue(VALID_CITIES.contains(city.toLowerCase()), "Invalid city: " + city);
+        this.readerType = System.getProperty("readerType") != null ? System.getProperty("readerType"): "";
 
         this.optargs = new HashMap<>();
         initOptargs();

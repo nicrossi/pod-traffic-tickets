@@ -2,6 +2,8 @@ package ar.edu.itba.pod.tpe2.client.utils;
 
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import com.hazelcast.core.MultiMap;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
@@ -14,98 +16,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+@Slf4j
 public class ReaderProvider {
-    public static void readFilesFor(
+    private final ReadService rs;
+    private final DefaultReader dr;
+    private final FastCsvReader fr;
+
+    public ReaderProvider() {
+        this.rs = new ReadService();
+        this.dr = new DefaultReader();
+        this.fr = new FastCsvReader();
+    }
+
+    public void readFilesFor(
             String city,
             boolean strictAgencies,
             boolean strictInfractions,
             MultiMap<String, Ticket> ticketsMultiMap,
-            AtomicInteger key
-    ) throws IOException {
+            AtomicInteger key,
+            String readerType
+    ) throws IOException, ExecutionException, InterruptedException {
         String inPath = Validate.notBlank(System.getProperty("inPath"));
-
-        // get infractions and their names
-        Map<String, String> infractionsMap = new HashMap<>();
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "infractions" + city + ".csv"), StandardCharsets.UTF_8)) {
-            lines.skip(1)
-                    .map(line -> line.split(";"))
-                    .forEach(parts -> infractionsMap.put(parts[0], parts[1]));
-        }
-
-        // get agencies
-        List<String> agencies = new ArrayList<>();
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "agencies" + city + ".csv"), StandardCharsets.UTF_8)) {
-            lines.skip(1)
-                    .forEach(line -> agencies.add(line));
-        }
-
-        switch (city) {
-            case "CHI":
-                chiReader(inPath, agencies, infractionsMap, strictAgencies, strictInfractions, ticketsMultiMap, key);
+        switch (readerType.toLowerCase()) {
+            case "fastcsv":
+                log.info("Using FastCSV reader");
+                fr.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, key);
                 break;
-            case "NYC":
+            case "parallel":
+                log.info("Using parallel reader");
+                rs.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, key);
+                break;
             default:
-                nycReader(inPath, agencies, infractionsMap, strictAgencies, strictInfractions, ticketsMultiMap, key);
-                break;
+                log.info("Using default reader");
+                dr.sequential_reader(city, strictAgencies, strictInfractions, ticketsMultiMap, key, inPath);
         }
+        dr.sequential_reader(city, strictAgencies, strictInfractions, ticketsMultiMap, key, inPath);
+
     }
 
-    private static void chiReader(
-            String inPath,
-            List<String> agencies,
-            Map<String, String> infractionsMap,
-            boolean strictAgencies,
-            boolean strictInfractions,
-            MultiMap<String, Ticket> ticketsMultiMap,
-            AtomicInteger key
-    ) throws IOException {
-        // CSV File Reading and Key Value Source Loading
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsCHI.csv"), StandardCharsets.UTF_8)) {
-            lines.skip(1)
-                    .map(line -> line.split(";"))
-                    .filter(parts -> !strictAgencies || agencies.contains(parts[2]))
-                    .filter(parts -> !strictInfractions || infractionsMap.containsKey(parts[4]))
-                    .map(parts -> new Ticket(
-                                    parts[3],
-                                    parts[2],
-                                    parts[1],
-                                    infractionsMap.get(parts[4]),
-                                    parts[4],
-                                    Double.valueOf(parts[5]),
-                                    DateUtils.parseDateCHI(parts[0])
-                            )
-                    ).forEach(ticket -> ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), ticket));
-        }
-    }
-
-
-    private static void nycReader(
-            String inPath,
-            List<String> agencies,
-            Map<String, String> infractionsMap,
-            boolean strictAgencies,
-            boolean strictInfractions,
-            MultiMap<String, Ticket> ticketsMultiMap,
-            AtomicInteger key
-    ) throws IOException {
-        // CSV File Reading and Key Value Source Loading
-        try (Stream<String> lines = Files.lines(Paths.get(inPath + "ticketsNYC.csv"), StandardCharsets.UTF_8)) {
-            lines.skip(1)
-                    .map(line -> line.split(";"))
-                    .filter(parts -> !strictAgencies || agencies.contains(parts[3]))
-                    .filter(parts -> !strictInfractions || infractionsMap.containsKey(parts[1]))
-                    .map(parts -> new Ticket(
-                            parts[0],
-                            parts[3],
-                            parts[5],
-                            infractionsMap.get(parts[1]),
-                            parts[1],
-                            Double.valueOf(parts[2]),
-                            DateUtils.parseDateNYC(parts[4]))
-                    ).forEach(ticket -> ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), ticket));
-        }
-    }
 }

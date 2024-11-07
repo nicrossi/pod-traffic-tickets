@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.tpe2.client.utils;
 
 import ar.edu.itba.pod.tpe2.common.Ticket;
+import de.siegmar.fastcsv.reader.NamedCsvRecord;
 
 import java.util.Map;
 import java.util.Optional;
@@ -19,5 +20,16 @@ public class TicketParserNYC implements TicketParser {
                 Double.valueOf(parts[2]),
                 DateUtils.parseDateNYC(parts[4])
         ));
+    }
+
+    public Ticket ticketFromCsvRecord(final NamedCsvRecord r, Map<String, String> infractionsMap) {
+        return new Ticket(
+                r.getField("Plate"),
+                r.getField("Issuing Agency"),
+                r.getField("County Name"),
+                infractionsMap.get(r.getField("Infraction ID")),
+                r.getField("Infraction ID"),
+                Double.parseDouble(r.getField("Fine Amount")),
+                DateUtils.parseDateNYC(r.getField("Issue Date")));
     }
 }

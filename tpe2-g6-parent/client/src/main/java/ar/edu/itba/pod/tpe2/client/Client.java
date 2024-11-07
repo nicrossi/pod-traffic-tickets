@@ -73,11 +73,10 @@ public class Client {
 
             final AtomicInteger auxKey = new AtomicInteger(); //this is to be used for the tickets "uuid"
 
-            // ReaderProvider.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
             // TODO: More tests using the Read Service!
-            // Current Best score: aprox. 4.40 min to read 5M rows
-            final ReadService readService = new ReadService();
-            readService.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey);
+
+            ReaderProvider reader = new ReaderProvider();
+            reader.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, auxKey, clientAgrs.getReaderType());
 
             // [get timestamp for file reading end]
             Date tsReadEnd = new Date();
