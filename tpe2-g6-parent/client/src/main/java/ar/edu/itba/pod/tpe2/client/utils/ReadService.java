@@ -2,15 +2,23 @@ package ar.edu.itba.pod.tpe2.client.utils;
 
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import com.hazelcast.core.MultiMap;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.NamedCsvRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class ReadService {
@@ -87,16 +96,31 @@ public class ReadService {
     }
 
     private static Map<String, String> loadInfractions(String inPath, String city) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(inPath + "infractions" + city + ".csv"), StandardCharsets.UTF_8)) {
-            return reader.lines().skip(1)
-                    .map(line -> line.split(";"))
-                    .collect(Collectors.toMap(parts -> parts[0], parts -> parts[1]));
+        Path infractionsPath = Paths.get(inPath + "infractions" + city + ".csv");
+        validateIfFileExist(infractionsPath);
+        Reader reader = Files.newBufferedReader(infractionsPath, StandardCharsets.UTF_8);
+        try (CsvReader<NamedCsvRecord> csvreader = CsvReader.builder()
+                .skipEmptyLines(true)
+                .fieldSeparator(';')
+                .ofNamedCsvRecord(reader) ) {
+            return csvreader.stream()
+                    .skip(1)
+                    .collect(Collectors.toMap(row -> row.getField(0), row -> row.getField(1)));
         }
     }
 
     private static List<String> loadAgencies(String inPath, String city) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(inPath + "agencies" + city + ".csv"), StandardCharsets.UTF_8)) {
-            return reader.lines().skip(1).toList();
+        Path agenciesPath = Paths.get(inPath + "agencies" + city + ".csv");
+        validateIfFileExist(agenciesPath);
+        Reader reader = Files.newBufferedReader(agenciesPath, StandardCharsets.UTF_8);
+        try (CsvReader<NamedCsvRecord> csvreader = CsvReader.builder()
+                .skipEmptyLines(true)
+                .fieldSeparator(';')
+                .ofNamedCsvRecord(reader) ) {
+            return csvreader.stream()
+                    .skip(1)
+                    .map(row -> row.getField(0))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -110,22 +134,22 @@ public class ReadService {
             AtomicInteger key,
             TicketParser parser
     ) throws IOException {
-        final int BATCH_SIZE = 50000; // Too big batch could lead to OOO exception
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath), StandardCharsets.UTF_8)) {
-            List<String> batch = new ArrayList<>(BATCH_SIZE);
-            String line;
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                batch.add(line);
-                if (batch.size() == BATCH_SIZE) {
-                    processBatch(batch, agencies, infractionsMap, strictAgencies, strictInfractions, ticketsMultiMap, key, parser);
-                    batch.clear();
-                }
-            }
-            // Process remaining lines
-            if (!batch.isEmpty()) {
-                processBatch(batch, agencies, infractionsMap, strictAgencies, strictInfractions, ticketsMultiMap, key, parser);
-            }
+        Path inputFilePath = Paths.get(filePath);
+        validateIfFileExist(inputFilePath);
+        Reader reader = Files.newBufferedReader(inputFilePath, StandardCharsets.UTF_8);
+        try (CsvReader<NamedCsvRecord> csvreader = CsvReader.builder()
+                .skipEmptyLines(true)
+                .fieldSeparator(';')
+                .ofNamedCsvRecord(reader)) {
+            csvreader.stream()
+                    .skip(1)
+                    .forEach(row -> {
+                       Ticket t = parser.ticketFromCsvRecord(row, infractionsMap);
+                       if ((!strictAgencies || agencies.contains(t.getAgency())) &&
+                               (!strictInfractions || t.getInfraction() != null)) {
+                            ticketsMultiMap.put(String.valueOf(key.getAndIncrement()), t);
+                       }
+                    });
         }
     }
 
@@ -154,5 +178,11 @@ public class ReadService {
 
         // Wait for all tasks to complete
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+    }
+
+    private static void validateIfFileExist(Path infractionsPath) throws FileNotFoundException {
+        if (!Files.exists(infractionsPath)) {
+            throw new FileNotFoundException("File not found: " + infractionsPath);
+        }
     }
 }
