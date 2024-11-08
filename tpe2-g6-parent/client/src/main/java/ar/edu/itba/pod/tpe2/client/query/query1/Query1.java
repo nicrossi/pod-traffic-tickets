@@ -3,10 +3,7 @@ package ar.edu.itba.pod.tpe2.client.query.query1;
 import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.common.Ticket;
-import ar.edu.itba.pod.tpe2.common.query1.Query1Collator;
-import ar.edu.itba.pod.tpe2.common.query1.Query1Mapper;
-import ar.edu.itba.pod.tpe2.common.query1.Query1ReducerFactory;
-import ar.edu.itba.pod.tpe2.common.query1.Query1Result;
+import ar.edu.itba.pod.tpe2.common.query1.*;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.mapreduce.Job;
 import lombok.NoArgsConstructor;
@@ -31,6 +28,7 @@ public class Query1 implements QueryStrategy {
         // TODO:
         ICompletableFuture<SortedSet<Query1Result>> future = job
                 .mapper(new Query1Mapper())
+                .combiner(new Query1CombinerFactory())
                 .reducer(new Query1ReducerFactory())
                 .submit(new Query1Collator());
 
