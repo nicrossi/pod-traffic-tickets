@@ -4,6 +4,7 @@ import ar.edu.itba.pod.tpe2.client.query.QueryStrategy;
 import ar.edu.itba.pod.tpe2.client.utils.Writer;
 import ar.edu.itba.pod.tpe2.common.Ticket;
 import ar.edu.itba.pod.tpe2.query2.Query2Collator;
+import ar.edu.itba.pod.tpe2.query2.Query2CombinerFactory;
 import ar.edu.itba.pod.tpe2.query2.Query2Mapper;
 import ar.edu.itba.pod.tpe2.query2.Query2ReducerFactory;
 import com.hazelcast.core.ICompletableFuture;
@@ -29,6 +30,7 @@ public class Query2 implements QueryStrategy {
 
         ICompletableFuture<List<String>> future = job
                 .mapper(new Query2Mapper())
+                .combiner(new Query2CombinerFactory())
                 .reducer(new Query2ReducerFactory())
                 .submit(new Query2Collator());
 
