@@ -19,7 +19,7 @@ Programacion de objetos distribuidos
 
 ### Usar el cliente
 1. `cd` a `tpe2-g6-parent-client-2024.2Q`.
-2. Dar permisos de ejecucion a los scripts `Query1.sh`, `Query2.sh`, `Query3.sh`, `Query4.sh`
+2. Dar permisos de ejecucion a los scripts `query1.sh`, `query2.sh`, `query3.sh`, `query4.sh`
 
 ### Ejemplos de uso
 Parametros: 
@@ -27,7 +27,7 @@ Parametros:
 - `city`: Ciudad elegida, puede ser Chicago `CHI`, o New York `NYC`
 - `inPath`: path donde están los archivos de entrada de multas, infracciones y agencias.
 - `outPath`: path donde estarán ambos archivos de salida `queryX.csv` y `timeX.txt`.
-- `readerType`: Tipo de reader a usar
+- `readerType`: Tipo de reader a usar, por default usa `parallel`
 
 **Query 1** con reader secuencial
 ```bash
@@ -35,6 +35,7 @@ Parametros:
           -Dcity=NYC 
           -DinPath=/afs/it.itba.edu.ar/pub/pod/ 
           -DoutPath=/afs/it.itba.edu.ar/pub/pod-write/
+          -DreaderType=sequential
 ```
 **Query 1** con reader paralelo
 ```bash
@@ -54,7 +55,7 @@ Parametros:
 ```
 **Query 2** con reader secuencial
 ```bash
-./query2.sh -Daddresses='10.6.0.1:5701' -Dcity=NYC  -DinPath=. -DoutPath=.
+./query2.sh -Daddresses='10.6.0.1:5701' -DreaderType=sequential -Dcity=NYC  -DinPath=. -DoutPath=.
 ```
 **Query 3** con reader paralelo
 ```bash
@@ -71,4 +72,5 @@ Parametros:
             -DinPath=. -DoutPath=. 
             -Dn=3 
             -Dagency=CPD-Airport
+            -DreaderType=sequential
 ```
