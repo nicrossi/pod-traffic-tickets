@@ -5,6 +5,7 @@ Programacion de objetos distribuidos
 ## Grupo 6
 - Rossi, Nicolas
 - Ricarte, Matias Agustin
+- Panighini, Franco
 
 ## Instrucciones
 ### Build
