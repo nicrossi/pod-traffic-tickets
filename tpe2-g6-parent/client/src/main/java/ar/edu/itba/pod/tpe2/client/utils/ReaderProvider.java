@@ -46,16 +46,16 @@ public class ReaderProvider {
                 log.info("Using FastCSV reader");
                 fr.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, key);
                 break;
+            case "sequential":
+                log.info("Using sequential reader");
+                dr.sequential_reader(city, strictAgencies, strictInfractions, ticketsMultiMap, key, inPath);
+                break;
             case "parallel":
+            default:
                 log.info("Using parallel reader");
                 rs.readFilesFor(city, strictAgencies, strictInfractions, ticketsMultiMap, key);
-                break;
-            default:
-                log.info("Using default reader");
-                dr.sequential_reader(city, strictAgencies, strictInfractions, ticketsMultiMap, key, inPath);
+               break;
         }
-        dr.sequential_reader(city, strictAgencies, strictInfractions, ticketsMultiMap, key, inPath);
-
     }
 
 }
